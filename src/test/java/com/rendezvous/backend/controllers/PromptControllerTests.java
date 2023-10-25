@@ -23,8 +23,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rendezvous.backend.filter.JwtAuthenticationFilter;
 import com.rendezvous.backend.models.Prompt;
 import com.rendezvous.backend.services.PromptService;
+import com.rendezvous.backend.utilities.JwtUtil;
 
 @WebMvcTest(controllers = PromptController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -37,6 +39,12 @@ public class PromptControllerTests {
 	
 	@Autowired
 	private ObjectMapper objectMapper;
+	
+	@MockBean
+	JwtUtil jwtUtil;
+	
+	@MockBean
+	JwtAuthenticationFilter jwtFilter;
 	
 	@MockBean
 	PromptService promptService;
@@ -54,7 +62,7 @@ public class PromptControllerTests {
 		
 		when(promptService.getAllPrompts()).thenReturn(prompts);
 		
-		mvc.perform(get(STARTING_URI + "/prompt"))
+		mvc.perform(get(STARTING_URI + "/prompts"))
 			.andDo(print())
 			.andExpect(status().isOk());
 		
