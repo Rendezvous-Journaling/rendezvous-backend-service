@@ -34,11 +34,9 @@ public class JwtUtil {
 	
 	public List<SimpleGrantedAuthority> extractUserRoles(String token) throws JsonMappingException, JsonProcessingException{
 		Claims claims = extractAllClaims(token);
-		System.out.println("All claims: " + claims);
 		
 		// Extract the roles claim as JSON string
 		String rolesJson = claims.get("roles", String.class);
-		System.out.println("Roles JSON: " + rolesJson);
 		
 		// ObjectMapper created for deserialization
 		ObjectMapper objectMapper = new ObjectMapper();
