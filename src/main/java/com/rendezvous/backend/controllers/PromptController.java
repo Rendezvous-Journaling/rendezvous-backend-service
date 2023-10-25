@@ -24,10 +24,18 @@ public class PromptController {
 	private PromptService promptService;
 	
 	
-	@GetMapping("/prompt")
+	@GetMapping("/prompts")
 	public ResponseEntity<?> getAllPrompts(){
 		
 		List<Prompt> response = promptService.getAllPrompts();
+		
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+	
+	@GetMapping("/prompt")
+	public ResponseEntity<?> getRandomPrompt() throws Exception{
+		
+		Prompt response = promptService.getRandomPrompt();
 		
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
