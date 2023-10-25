@@ -2,6 +2,7 @@ package com.rendezvous.backend.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,6 @@ public class PromptService {
 	public List<Prompt> getAllPrompts() {
 		
 		List<Prompt> prompts = promptRepo.findAll();
-		
-		
 		return prompts;
 	}
 
@@ -31,6 +30,7 @@ public class PromptService {
 	}
 
 	
+	// Test route just to populate the db
 	public List<Prompt> createManyPrompts(@Valid List<Prompt> prompts) {
 		
 		List<Prompt> created = new ArrayList<>();
@@ -42,6 +42,21 @@ public class PromptService {
 		
 		
 		return created;
+	}
+
+	public Prompt getRandomPrompt() throws Exception {
+		
+		
+		List<Prompt> promptList = promptRepo.findAll();
+		
+		if(promptList.isEmpty()) {
+			throw new Exception();
+		}
+		
+		// Prepare a random object to generate a random index value 
+		Random random = new Random();
+		int randomIndex = random.nextInt(promptList.size());	
+		return promptList.get(randomIndex);
 	}
 
 
