@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rendezvous.backend.exceptions.ResourceNotFoundException;
 import com.rendezvous.backend.models.Entry;
 import com.rendezvous.backend.services.EntryService;
 
@@ -34,7 +35,7 @@ public class EntryController {
 	
 	// Get one entry of a specific user
 	@GetMapping("/entry/{entryId}/user/{userId}")
-	public ResponseEntity<?> getUserEntry(@PathVariable Long entryId, @PathVariable Long userId){
+	public ResponseEntity<?> getUserEntry(@PathVariable Long entryId, @PathVariable Long userId) throws ResourceNotFoundException{
 		
 		Entry response = entryService.getUserEntry(entryId, userId);
 		
@@ -43,7 +44,7 @@ public class EntryController {
 	
 	// Create an entry linked to a specific user
 	@PostMapping("/entry")
-	public ResponseEntity<?> createUserEntry(@RequestBody Entry entry){
+	public ResponseEntity<?> createUserEntry(@RequestBody Entry entry) throws ResourceNotFoundException{
 		
 		Entry response = entryService.createUserEntry(entry);
 		

@@ -7,6 +7,7 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.rendezvous.backend.exceptions.ResourceNotFoundException;
 import com.rendezvous.backend.models.Prompt;
 import com.rendezvous.backend.repositories.PromptRepo;
 
@@ -50,7 +51,7 @@ public class PromptService {
 		List<Prompt> promptList = promptRepo.findAll();
 		
 		if(promptList.isEmpty()) {
-			throw new Exception();
+			throw new ResourceNotFoundException("prompt");
 		}
 		
 		// Prepare a random object to generate a random index value 
