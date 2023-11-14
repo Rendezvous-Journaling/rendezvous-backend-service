@@ -70,6 +70,6 @@ public class EntryController {
 		
 		Entry response = entryService.deleteUserEntry(entry);
 		
-		return ResponseEntity.status(HttpStatus.OK).body(response);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
 	}
 }
