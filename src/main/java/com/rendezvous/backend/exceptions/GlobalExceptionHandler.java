@@ -33,4 +33,10 @@ public class GlobalExceptionHandler {
 		
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDetails);
 	}
+	
+	@ExceptionHandler(RateExceededException.class)
+	public ResponseEntity<?> rateExceeded(RateExceededException ex, WebRequest request){
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorDetails);
+	}
 }

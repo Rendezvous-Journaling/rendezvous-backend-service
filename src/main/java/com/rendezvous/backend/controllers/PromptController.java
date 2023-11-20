@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rendezvous.backend.exceptions.RateExceededException;
 import com.rendezvous.backend.models.Prompt;
 import com.rendezvous.backend.services.PromptService;
 
@@ -25,7 +26,7 @@ public class PromptController {
 	
 	
 	@GetMapping("/prompts")
-	public ResponseEntity<?> getAllPrompts(){
+	public ResponseEntity<?> getAllPrompts() throws RateExceededException {
 		
 		List<Prompt> response = promptService.getAllPrompts();
 		
@@ -41,7 +42,7 @@ public class PromptController {
 	}
 	
 	@PostMapping("/prompt")
-	public ResponseEntity<?> createPrompt(@RequestBody @Valid Prompt prompt){
+	public ResponseEntity<?> createPrompt(@RequestBody @Valid Prompt prompt) throws RateExceededException{
 		
 		Prompt response = promptService.createPrompt(prompt);
 		
@@ -49,7 +50,7 @@ public class PromptController {
 	}
 	
 	@PostMapping ("/prompts")
-	public ResponseEntity<?> createManyPrompts(@RequestBody @Valid List<Prompt> prompts){
+	public ResponseEntity<?> createManyPrompts(@RequestBody @Valid List<Prompt> prompts) throws RateExceededException{
 		
 		List<Prompt> response = promptService.createManyPrompts(prompts);
 		
