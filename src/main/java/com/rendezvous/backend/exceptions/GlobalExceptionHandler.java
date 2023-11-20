@@ -39,4 +39,10 @@ public class GlobalExceptionHandler {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorDetails);
 	}
+
+	@ExceptionHandler(InvalidPermissionsException.class)
+	public ResponseEntity<?> invalidPermissions(InvalidPermissionsException ex, WebRequest request){
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorDetails);
+	}
 }
