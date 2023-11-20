@@ -10,8 +10,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.google.common.util.concurrent.RateLimiter;
 import com.rendezvous.backend.dtos.EntryRequestDto;
 import com.rendezvous.backend.exceptions.InvalidPermissionsException;
+import com.rendezvous.backend.exceptions.RateExceededException;
 import com.rendezvous.backend.exceptions.ResourceNotFoundException;
 import com.rendezvous.backend.models.Entry;
 import com.rendezvous.backend.models.Prompt;
@@ -27,6 +29,8 @@ public class EntryService {
 	@Autowired 
 	PromptRepo promptRepo;
 	
+	private final RateLimiter rateLimiter = RateLimiter.create(50);
+	
 	public boolean compareUserIds(Long userIdFromRequest) {
 		
 		 // Retrieve the authentication object from the security context
@@ -38,9 +42,10 @@ public class EntryService {
         return userIdFromToken == userIdFromRequest;
 	}
 
-	public Entry createUserEntry(Entry entry) throws ResourceNotFoundException, InvalidPermissionsException {
-		
+	public Entry createUserEntry(Entry entry) throws ResourceNotFoundException, InvalidPermissionsException, RateExceededException {
+				
 		if(!compareUserIds(entry.getUserId())) throw new InvalidPermissionsException();
+		if(!rateLimiter.tryAcquire()) throw new RateExceededException();
 		
 		Optional<Prompt> promptFound = promptRepo.findById(entry.getPrompt().getId());
 		if(promptFound.isEmpty()) throw new ResourceNotFoundException("prompt");
@@ -53,9 +58,10 @@ public class EntryService {
 		return entryRepo.save(entry);
 	}
 
-	public Entry getUserEntry(Long entryId, Long userId) throws ResourceNotFoundException, InvalidPermissionsException {
-		
+	public Entry getUserEntry(Long entryId, Long userId) throws ResourceNotFoundException, InvalidPermissionsException, RateExceededException {
+				
 		if(!compareUserIds(userId)) throw new InvalidPermissionsException();
+		if(!rateLimiter.tryAcquire()) throw new RateExceededException();
 		
 		Optional<Entry> found = entryRepo.findByIdAndUserId(entryId, userId);
 		
@@ -69,21 +75,23 @@ public class EntryService {
 	}
 
 	public List<Entry> getUserEntries(Long userId) throws Exception {
-		
+				
 		if(!compareUserIds(userId)) throw new InvalidPermissionsException();
+		if(!rateLimiter.tryAcquire()) throw new RateExceededException();
 		
 		List<Entry> found = entryRepo.findAllByUserId(userId);
 		
 		return found;
 	}
 
-	public Entry updateUserEntry(EntryRequestDto entry ) throws ResourceNotFoundException, InvalidPermissionsException {
+	public Entry updateUserEntry(EntryRequestDto entry ) throws ResourceNotFoundException, InvalidPermissionsException, RateExceededException {
 		
 		Long userIdFromRequest = entry.getUserId();
 		Long entryIdFromRequest = entry.getEntryId();
 		
 		// Need to check the userId stored within the token to ensure the proper user is trying to update the entry
 		if (!compareUserIds(userIdFromRequest)) throw new InvalidPermissionsException();
+		if(!rateLimiter.tryAcquire()) throw new RateExceededException();
 		
 		Optional<Entry> found = entryRepo.findByIdAndUserId(entryIdFromRequest, userIdFromRequest);
 		if(found.isEmpty()) throw new ResourceNotFoundException("entry");
@@ -96,12 +104,13 @@ public class EntryService {
 		return saved;
 	}
 
-	public Entry deleteUserEntry(EntryRequestDto entry) throws InvalidPermissionsException, ResourceNotFoundException {
+	public Entry deleteUserEntry(EntryRequestDto entry) throws InvalidPermissionsException, ResourceNotFoundException, RateExceededException {
 		
 		Long userIdFromRequest = entry.getUserId();
 		Long entryIdFromRequest = entry.getEntryId();
 		
 		if(!compareUserIds(userIdFromRequest)) throw new InvalidPermissionsException();
+		if(!rateLimiter.tryAcquire()) throw new RateExceededException();
 		
 		Optional<Entry> found = entryRepo.findByIdAndUserId(entryIdFromRequest, userIdFromRequest);
 		if(found.isEmpty()) throw new ResourceNotFoundException("entry");
