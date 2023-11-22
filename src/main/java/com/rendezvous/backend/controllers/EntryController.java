@@ -14,12 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.util.concurrent.RateLimiter;
 import com.rendezvous.backend.dtos.EntryRequestDto;
 import com.rendezvous.backend.exceptions.ErrorDetails;
 import com.rendezvous.backend.exceptions.InvalidPermissionsException;
+import com.rendezvous.backend.exceptions.RateExceededException;
 import com.rendezvous.backend.exceptions.ResourceNotFoundException;
 import com.rendezvous.backend.models.Entry;
-import com.rendezvous.backend.models.Prompt;
 import com.rendezvous.backend.services.EntryService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -109,7 +110,7 @@ public class EntryController {
 			)
 	})
 	@GetMapping("/entry/{entryId}/user/{userId}")
-	public ResponseEntity<?> getUserEntry(@PathVariable Long entryId, @PathVariable Long userId) throws ResourceNotFoundException, InvalidPermissionsException{
+	public ResponseEntity<?> getUserEntry(@PathVariable Long entryId, @PathVariable Long userId) throws ResourceNotFoundException, InvalidPermissionsException, RateExceededException{
 		
 		Entry response = entryService.getUserEntry(entryId, userId);
 		
@@ -146,7 +147,7 @@ public class EntryController {
 	)
 	})
 	@PostMapping("/entry")
-	public ResponseEntity<?> createUserEntry(@RequestBody Entry entry) throws ResourceNotFoundException, InvalidPermissionsException{
+	public ResponseEntity<?> createUserEntry(@RequestBody Entry entry) throws ResourceNotFoundException, InvalidPermissionsException, RateExceededException{
 		
 		Entry response = entryService.createUserEntry(entry);
 		
@@ -189,7 +190,7 @@ public class EntryController {
 			),
 	})
 	@PutMapping("/entry")
-	public ResponseEntity<?> updateUserEntry(@Valid @RequestBody EntryRequestDto entry) throws ResourceNotFoundException, InvalidPermissionsException {
+	public ResponseEntity<?> updateUserEntry(@Valid @RequestBody EntryRequestDto entry) throws ResourceNotFoundException, InvalidPermissionsException, RateExceededException {
 		Entry response = entryService.updateUserEntry(entry);
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -231,7 +232,7 @@ public class EntryController {
 			),
 	})
 	@DeleteMapping("/entry")
-	public ResponseEntity<?> deleteUserEntry(@Valid @RequestBody EntryRequestDto entry) throws InvalidPermissionsException, ResourceNotFoundException{
+	public ResponseEntity<?> deleteUserEntry(@Valid @RequestBody EntryRequestDto entry) throws InvalidPermissionsException, ResourceNotFoundException, RateExceededException{
 		
 		Entry response = entryService.deleteUserEntry(entry);
 		
