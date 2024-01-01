@@ -141,7 +141,6 @@ public class PromptController {
 	public ResponseEntity<?> createPrompt(@RequestBody @Valid Prompt prompt) throws RateExceededException{
 		
 		Prompt response = promptService.createPrompt(prompt);
-		
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 	

@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.google.common.util.concurrent.RateLimiter;
@@ -22,10 +25,13 @@ public class PromptService {
 	private PromptRepo promptRepo;
 	
 	private final RateLimiter rateLimiter = RateLimiter.create(50);
+	
+	private static final Logger logger = LoggerFactory.getLogger(PromptService.class);
 
 	public List<Prompt> getAllPrompts() throws RateExceededException  {
 		
 		if(!rateLimiter.tryAcquire()) {
+			logger.error("getAllPrompts: rate limit exceeded, Authentication={}", SecurityContextHolder.getContext().getAuthentication());
 			throw new RateExceededException();
 		}
 		
@@ -34,8 +40,9 @@ public class PromptService {
 	}
 
 	public Prompt createPrompt(@Valid Prompt prompt) throws RateExceededException {
-		
+				
 		if(!rateLimiter.tryAcquire()) {
+			logger.error("getAllPrompts: rate limit exceeded, Authentication={}", SecurityContextHolder.getContext().getAuthentication());
 			throw new RateExceededException();
 		}
 		
@@ -45,8 +52,10 @@ public class PromptService {
 	
 	// Test route just to populate the db
 	public List<Prompt> createManyPrompts(@Valid List<Prompt> prompts) throws RateExceededException {
+	
 		
 		if(!rateLimiter.tryAcquire()) {
+			logger.error("getAllPrompts: rate limit exceeded, Authentication={}", SecurityContextHolder.getContext().getAuthentication());
 			throw new RateExceededException();
 		}
 		
@@ -64,6 +73,7 @@ public class PromptService {
 	public Prompt getRandomPrompt() throws Exception {
 		
 		if(!rateLimiter.tryAcquire()) {
+			logger.error("getAllPrompts: rate limit exceeded, Authentication={}", SecurityContextHolder.getContext().getAuthentication());
 			throw new RateExceededException();
 		}
 		

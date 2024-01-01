@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.util.concurrent.RateLimiter;
 import com.rendezvous.backend.dtos.EntryRequestDto;
 import com.rendezvous.backend.exceptions.ErrorDetails;
 import com.rendezvous.backend.exceptions.InvalidPermissionsException;
