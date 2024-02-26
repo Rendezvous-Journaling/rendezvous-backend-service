@@ -3,8 +3,10 @@ package com.rendezvous.backend.controllers;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,6 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rendezvous.backend.dtos.EntryRequestDto;
 import com.rendezvous.backend.filter.JwtAuthenticationFilter;
 import com.rendezvous.backend.models.Entry;
 import com.rendezvous.backend.models.Prompt;
@@ -102,5 +105,41 @@ private static final String STARTING_URI = "http://localhost:8080/api";
 			.andExpect(status().isCreated());
 		
 		verify(entryService, times(1)).createUserEntry(Mockito.any(Entry.class));
+	}
+	
+	@Test
+	public void testUpdateUserEntry() throws Exception {
+		Prompt prompt = new Prompt(1L,"What are you grateful for today?");
+		EntryRequestDto entryRequest = new EntryRequestDto(1L, 1L, "I like updating");
+		Entry entry = new Entry(1L, "I like pie", 1L, prompt,  new Timestamp(0));
+		Entry updatedEntry = new Entry(1L, "I like updating", 1L, prompt, entry.getCreatedAt());
+		
+		when(entryService.updateUserEntry(Mockito.any(EntryRequestDto.class))).thenReturn(updatedEntry);
+		
+		mvc.perform(put(STARTING_URI + "/entry")
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.content(objectMapper.writeValueAsString(entryRequest)))
+		.andDo(print())
+		.andExpect(status().isCreated());
+		
+		verify(entryService, times(1)).updateUserEntry(Mockito.any(EntryRequestDto.class));
+	}
+	
+	@Test
+	public void testDeleteUserEntry() throws Exception {
+		Prompt prompt = new Prompt(1L,"What are you grateful for today?");
+		EntryRequestDto entryRequest = new EntryRequestDto(1L, 1L, "");
+		Entry entry = new Entry(1L, "I like pie", 1L, prompt,  new Timestamp(0));
+		Entry deletedEntry = new Entry(1L, "I like updating", 1L, prompt, entry.getCreatedAt());
+		
+		when(entryService.deleteUserEntry(Mockito.any(EntryRequestDto.class))).thenReturn(deletedEntry);
+		
+		mvc.perform(delete(STARTING_URI + "/entry")
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.content(objectMapper.writeValueAsString(entryRequest)))
+		.andDo(print())
+		.andExpect(status().isNoContent());
+		
+		verify(entryService, times(1)).deleteUserEntry(Mockito.any(EntryRequestDto.class));
 	}
 }

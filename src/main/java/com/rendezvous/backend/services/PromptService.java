@@ -7,6 +7,8 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.common.util.concurrent.RateLimiter;
+import com.rendezvous.backend.exceptions.RateExceededException;
 import com.rendezvous.backend.exceptions.ResourceNotFoundException;
 import com.rendezvous.backend.models.Prompt;
 import com.rendezvous.backend.repositories.PromptRepo;
@@ -18,21 +20,35 @@ public class PromptService {
 	
 	@Autowired
 	private PromptRepo promptRepo;
+	
+	private final RateLimiter rateLimiter = RateLimiter.create(50);
 
-	public List<Prompt> getAllPrompts() {
+	public List<Prompt> getAllPrompts() throws RateExceededException  {
+		
+		if(!rateLimiter.tryAcquire()) {
+			throw new RateExceededException();
+		}
 		
 		List<Prompt> prompts = promptRepo.findAll();
 		return prompts;
 	}
 
-	public Prompt createPrompt(@Valid Prompt prompt) {
+	public Prompt createPrompt(@Valid Prompt prompt) throws RateExceededException {
+		
+		if(!rateLimiter.tryAcquire()) {
+			throw new RateExceededException();
+		}
 		
 		return promptRepo.save(prompt);
 	}
 
 	
 	// Test route just to populate the db
-	public List<Prompt> createManyPrompts(@Valid List<Prompt> prompts) {
+	public List<Prompt> createManyPrompts(@Valid List<Prompt> prompts) throws RateExceededException {
+		
+		if(!rateLimiter.tryAcquire()) {
+			throw new RateExceededException();
+		}
 		
 		List<Prompt> created = new ArrayList<>();
 		for(Prompt prompt : prompts) {
@@ -47,6 +63,10 @@ public class PromptService {
 
 	public Prompt getRandomPrompt() throws Exception {
 		
+		if(!rateLimiter.tryAcquire()) {
+			throw new RateExceededException();
+		}
+		
 		
 		List<Prompt> promptList = promptRepo.findAll();
 		
@@ -59,8 +79,4 @@ public class PromptService {
 		int randomIndex = random.nextInt(promptList.size());	
 		return promptList.get(randomIndex);
 	}
-
-
-	
-	
 }
