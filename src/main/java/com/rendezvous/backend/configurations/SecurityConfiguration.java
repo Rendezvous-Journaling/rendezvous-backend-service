@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -40,8 +41,9 @@ public class SecurityConfiguration {
 		.authorizeHttpRequests(auth -> 
 			auth.requestMatchers(HttpMethod.POST,"/api/prompt").hasRole("ADMIN")
 				.requestMatchers("/openapi.html","/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-				.anyRequest().authenticated()
-			);
+				.anyRequest().permitAll() //.authenticated()
+			)
+		.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 				
 		// Add jwtFilter here before requests
 		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
