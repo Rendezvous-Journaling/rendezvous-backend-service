@@ -49,4 +49,10 @@ public class GlobalExceptionHandler {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorDetails);
 	}
+	
+	@ExceptionHandler(InvalidTokenException.class)
+	public ResponseEntity<?> invalidToken(InvalidTokenException ex, WebRequest request){
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorDetails);
+	}
 }
